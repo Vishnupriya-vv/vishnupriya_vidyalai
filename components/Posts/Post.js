@@ -22,7 +22,6 @@ const Carousel = styled.div(() => ({
   '&::-webkit-scrollbar': {
     display: 'none',
   },
-  position: 'relative',
 }));
 
 const CarouselItem = styled.div(() => ({
@@ -46,13 +45,15 @@ const Content = styled.div(() => ({
 
 const Button = styled.button(() => ({
   position: 'absolute',
-  bottom: 0,
+  top: '50%',
+  transform: 'translateY(-50%)',
   backgroundColor: 'rgba(255, 255, 255, 0.5)',
   border: 'none',
   color: '#000',
   fontSize: '20px',
   cursor: 'pointer',
   height: '50px',
+  width: '30px',
 }));
 
 const PrevButton = styled(Button)`
@@ -63,13 +64,25 @@ const NextButton = styled(Button)`
   right: 10px;
 `;
 
+const UserInfo = styled.div(() => ({
+  padding: '10px',
+  borderTop: '1px solid #ddd',
+  backgroundColor: '#f9f9f9',
+  '& > p': {
+    margin: '5px 0',
+    fontSize: '14px',
+    color: '#333',
+  },
+}));
+
 const Post = ({ post }) => {
   const carouselRef = useRef(null);
 
   const handleNextClick = () => {
     if (carouselRef.current) {
+      const itemWidth = carouselRef.current.firstChild.offsetWidth;
       carouselRef.current.scrollBy({
-        left: 50,
+        left: itemWidth,
         behavior: 'smooth',
       });
     }
@@ -77,22 +90,31 @@ const Post = ({ post }) => {
 
   const handlePrevClick = () => {
     if (carouselRef.current) {
+      const itemWidth = carouselRef.current.firstChild.offsetWidth;
       carouselRef.current.scrollBy({
-        left: -70,
+        left: -itemWidth,
         behavior: 'smooth',
       });
     }
   };
 
+  // Provide default values if `post.user` or `post.images` are undefined
+  const userName = post.user?.name || 'Unknown';
+  const userEmail = post.user?.email || 'N/A';
+
   return (
     <PostContainer>
       <CarouselContainer>
         <Carousel ref={carouselRef}>
-          {post.images.map((image, index) => (
-            <CarouselItem key={index}>
-              <Image src={image.url} alt={post.title} />
-            </CarouselItem>
-          ))}
+          {post.images && post.images.length > 0 ? (
+            post.images.map((image, index) => (
+              <CarouselItem key={index}>
+                <Image src={image.url} alt={post.title} />
+              </CarouselItem>
+            ))
+          ) : (
+            <p>No images available</p>
+          )}
         </Carousel>
         <PrevButton onClick={handlePrevClick}>&#10094;</PrevButton>
         <NextButton onClick={handleNextClick}>&#10095;</NextButton>
@@ -101,18 +123,26 @@ const Post = ({ post }) => {
         <h2>{post.title}</h2>
         <p>{post.body}</p>
       </Content>
+      <UserInfo>
+        <p><strong>Author:</strong> {userName}</p>
+        <p><strong>Email:</strong> {userEmail}</p>
+      </UserInfo>
     </PostContainer>
   );
 };
 
 Post.propTypes = {
   post: PropTypes.shape({
-    content: PropTypes.any,
-    images: PropTypes.shape({
-      map: PropTypes.func,
+    images: PropTypes.arrayOf(PropTypes.shape({
+      url: PropTypes.string,
+    })),
+    title: PropTypes.string.isRequired,
+    body: PropTypes.string.isRequired,
+    user: PropTypes.shape({
+      name: PropTypes.string,
+      email: PropTypes.string,
     }),
-    title: PropTypes.any,
-  }),
+  }).isRequired,
 };
 
 export default Post;
