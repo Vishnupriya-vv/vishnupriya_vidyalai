@@ -35,41 +35,53 @@ const LoadMoreButton = styled.button(() => ({
 export default function Posts() {
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [start, setStart] = useState(0);
 
   const { isSmallerDevice } = useWindowWidth();
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      const { data: posts } = await axios.get('/api/v1/posts', {
-        params: { start: 0, limit: isSmallerDevice ? 5 : 10 },
+  const loadPosts = async () => {
+    setIsLoading(true);
+    try {
+      const { data: newPosts } = await axios.get('/api/v1/posts', {
+        params: { start, limit: isSmallerDevice ? 5 : 10 },
       });
-      setPosts(posts);
-    };
 
-    fetchPost();
+      setPosts(prevPosts => [...prevPosts, ...newPosts]);
+
+      if (newPosts.length < (isSmallerDevice ? 5 : 10)) {
+        setHasMore(false); // No more posts to load
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    loadPosts();
   }, [isSmallerDevice]);
 
   const handleClick = () => {
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 3000);
+    setStart(prevStart => prevStart + (isSmallerDevice ? 5 : 10));
+    loadPosts();
   };
 
   return (
     <Container>
       <PostListContainer>
         {posts.map(post => (
-          <Post post={post} />
+          <Post key={post.id} post={post} />
         ))}
       </PostListContainer>
 
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <LoadMoreButton onClick={handleClick} disabled={isLoading}>
-          {!isLoading ? 'Load More' : 'Loading...'}
-        </LoadMoreButton>
-      </div>
+      {hasMore && (
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+          <LoadMoreButton onClick={handleClick} disabled={isLoading}>
+            {!isLoading ? 'Load More' : 'Loading...'}
+          </LoadMoreButton>
+        </div>
+      )}
     </Container>
   );
 }

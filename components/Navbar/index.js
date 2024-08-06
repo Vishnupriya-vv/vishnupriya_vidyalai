@@ -5,10 +5,10 @@ const Navbar = styled('nav')(() => ({
   backgroundColor: '#333',
   color: '#fff',
   width: '100%',
-  position: 'absolute',
-  top: 0,
-  left: 0,
-  zIndex: 1000,
+  position: 'sticky', // Change from 'absolute' to 'sticky'
+  top: 0, // Ensure it sticks to the top
+  zIndex: 1000, // Keep it above other content
+  padding: '10px 20px', 
 }));
 
 const ListItem = styled('li')(() => ({
@@ -29,18 +29,16 @@ const Link = styled('a')(() => ({
 
 const TopNavbar = () => {
   return (
-    <div>
-      <Navbar>
-        <ul style={{}}>
-          <ListItem>
-            <Link href={'/'}>Home</Link>
-          </ListItem>
-          <ListItem>
-            <Link href={'/users'}>Users</Link>
-          </ListItem>
-        </ul>
-      </Navbar>
-    </div>
+    <Navbar>
+      <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+        <ListItem>
+          <Link href={'/'}>Home</Link>
+        </ListItem>
+        <ListItem>
+          <Link href={'/users'}>Users</Link>
+        </ListItem>
+      </ul>
+    </Navbar>
   );
 };
 
