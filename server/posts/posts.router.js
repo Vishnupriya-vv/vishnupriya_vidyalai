@@ -1,8 +1,7 @@
 const express = require('express');
 const { fetchPosts } = require('./posts.service');
 const axios = require('axios');
-
-const router = express.Router(); // Initialize router
+const router = express.Router();
 
 router.get('/', async (req, res) => {
   try {

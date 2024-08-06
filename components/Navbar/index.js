@@ -8,7 +8,7 @@ const Navbar = styled('nav')(() => ({
   position: 'sticky', // Change from 'absolute' to 'sticky'
   top: 0, // Ensure it sticks to the top
   zIndex: 1000, // Keep it above other content
-  padding: '10px 20px', // Optional padding
+  padding: '10px 20px', 
 }));
 
 const ListItem = styled('li')(() => ({
